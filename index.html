@@ -1,0 +1,2131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Periodic Table Snakes & Ladders — Chemistry KSSM Edition</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-light: #334155;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --gold: #fbbf24;
+    --green: #22c55e;
+    --red: #ef4444;
+    --purple: #a855f7;
+    --border: #475569;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    background: radial-gradient(circle at top, #1e293b 0%, #090d16 100%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 12px;
+    max-width: 1200px;
+    width: 100%;
+  }
+
+  header h1 {
+    font-size: 1.72rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #38bdf8, #818cf8, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.4px;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+
+  /* Front Top Bar: Student Name, Class, Points & Admin Login */
+  .front-student-bar {
+    max-width: 1200px;
+    width: 100%;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.96));
+    border: 1.5px solid #38bdf8;
+    border-radius: 12px;
+    padding: 11px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  .front-identity-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .id-box {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .id-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent);
+    letter-spacing: 0.4px;
+  }
+
+  .id-value {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  .front-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .stat-chip {
+    background: #0f172a;
+    border: 1px solid #334155;
+    padding: 6px 12px;
+    border-radius: 8px;
+    color: var(--gold);
+    font-size: 0.88rem;
+    font-weight: 800;
+  }
+
+  .stat-chip.green {
+    color: #4ade80;
+  }
+
+  .main-container {
+    display: grid;
+    grid-template-columns: minmax(320px, 760px) 390px;
+    gap: 18px;
+    max-width: 1200px;
+    width: 100%;
+    align-items: start;
+  }
+
+  @media (max-width: 1040px) {
+    .main-container {
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+  }
+
+  /* Board Wrapper */
+  .board-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    aspect-ratio: 1 / 1;
+    background: #0b1120;
+    border: 3px solid #334155;
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+    overflow: hidden;
+  }
+
+  .board-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    width: 100%;
+    height: 100%;
+  }
+
+  .tile {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 3px 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+    user-select: none;
+    overflow: hidden;
+  }
+
+  .tile:hover {
+    filter: brightness(1.18);
+    z-index: 4;
+  }
+
+  .tile-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.66rem;
+    font-weight: 700;
+    opacity: 0.92;
+  }
+
+  .tile-badge {
+    font-size: 0.65rem;
+    line-height: 1;
+  }
+
+  .tile-symbol {
+    font-size: 1.15rem;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.05;
+    letter-spacing: -0.3px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.45);
+  }
+
+  .tile-name {
+    font-size: 0.52rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0.88;
+    font-weight: 600;
+  }
+
+  /* Element Category Colors */
+  .cat-nonmetal { background: linear-gradient(135deg, #0284c7, #0369a1); }
+  .cat-noble { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+  .cat-alkali { background: linear-gradient(135deg, #dc2626, #991b1b); }
+  .cat-alkaline { background: linear-gradient(135deg, #ea580c, #9a3412); }
+  .cat-metalloid { background: linear-gradient(135deg, #0d9488, #115e59); }
+  .cat-halogen { background: linear-gradient(135deg, #059669, #065f46); }
+  .cat-post { background: linear-gradient(135deg, #4f46e5, #3730a3); }
+  .cat-transition { background: linear-gradient(135deg, #b45309, #78350f); }
+  .cat-lanthanide { background: linear-gradient(135deg, #be185d, #831843); }
+  .cat-actinide { background: linear-gradient(135deg, #9333ea, #581c87); }
+
+  /* SVG Overlay */
+  .overlay-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* Tokens Layer */
+  .tokens-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .player-token {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    font-weight: 800;
+    border: 2px solid #ffffff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.75);
+    transition: left 0.35s cubic-bezier(0.22, 1, 0.36, 1), top 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.2s ease;
+    transform: translate(-50%, -50%);
+  }
+
+  .player-token.active-turn {
+    transform: translate(-50%, -50%) scale(1.24);
+    box-shadow: 0 0 12px 3px #fbbf24;
+    z-index: 15;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  }
+
+  .card h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .player-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid transparent;
+    font-size: 0.85rem;
+    gap: 6px;
+  }
+
+  .player-row.current {
+    border-color: var(--gold);
+    background: rgba(251, 191, 36, 0.14);
+  }
+
+  .player-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .player-name-stack {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .player-name-label {
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 145px;
+  }
+
+  .player-class-sub {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  .token-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    border: 1.5px solid #fff;
+    flex-shrink: 0;
+  }
+
+  .player-metrics {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+  }
+
+  .pts-badge {
+    background: rgba(34, 197, 94, 0.18);
+    border: 1px solid rgba(34, 197, 94, 0.5);
+    color: #4ade80;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+
+  .player-pos {
+    font-size: 0.8rem;
+    color: var(--gold);
+    font-weight: 700;
+    min-width: 42px;
+    text-align: right;
+  }
+
+  /* Dice & Controls */
+  .dice-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 4px;
+  }
+
+  .dice-box {
+    width: 62px;
+    height: 62px;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #f8fafc, #cbd5e1);
+    color: #0f172a;
+    font-size: 2rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.45);
+    flex-shrink: 0;
+  }
+
+  .dice-box.rolling {
+    animation: shake 0.35s infinite;
+  }
+
+  @keyframes shake {
+    0% { transform: rotate(0deg) scale(1.05); }
+    25% { transform: rotate(-12deg) scale(1.1); }
+    50% { transform: rotate(12deg) scale(1.05); }
+    75% { transform: rotate(-8deg) scale(1.1); }
+    100% { transform: rotate(0deg) scale(1); }
+  }
+
+  .btn {
+    padding: 9px 14px;
+    border: none;
+    border-radius: 9px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #38bdf8, #2563eb);
+    color: white;
+    width: 100%;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #22c55e, #15803d);
+    color: white;
+    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.4);
+  }
+
+  .btn-success:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+  }
+
+  .btn-admin {
+    background: linear-gradient(135deg, #a855f7, #6d28d9);
+    color: white;
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.4);
+  }
+
+  .btn-admin:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: var(--panel-light);
+    color: var(--text);
+    font-size: 0.8rem;
+    padding: 7px 11px;
+  }
+
+  .btn-secondary:hover {
+    background: #475569;
+  }
+
+  .status-log {
+    margin-top: 10px;
+    padding: 9px 11px;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.8);
+    border-left: 3px solid var(--accent);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    min-height: 46px;
+  }
+
+  /* Element Inspector */
+  .inspector-grid {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .inspector-tile {
+    width: 72px;
+    height: 78px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255,255,255,0.3);
+    text-align: center;
+  }
+
+  .inspector-tile .num { font-size: 0.72rem; font-weight: 700; }
+  .inspector-tile .sym { font-size: 1.65rem; font-weight: 900; line-height: 1.1; }
+  .inspector-tile .mass { font-size: 0.65rem; opacity: 0.9; }
+
+  .inspector-details h3 {
+    font-size: 1rem;
+    margin-bottom: 3px;
+  }
+
+  .inspector-details p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+
+  /* Legend */
+  .legend-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    font-size: 0.74rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* Modals */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.86);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 100;
+  }
+
+  .modal-backdrop.hidden {
+    display: none;
+  }
+
+  .modal-card {
+    background: #1e293b;
+    border: 2px solid #475569;
+    border-radius: 16px;
+    max-width: 620px;
+    width: 100%;
+    padding: 22px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+    animation: popIn 0.22s ease-out;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .modal-card.wide {
+    max-width: 880px;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.92); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .modal-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .modal-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-ladder { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+  .badge-snake { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+  .badge-setup { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; }
+  .badge-admin { background: rgba(168, 85, 247, 0.22); color: #d8b4fe; border: 1px solid #a855f7; }
+
+  .modal-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    line-height: 1.35;
+  }
+
+  .quiz-meta {
+    font-size: 0.82rem;
+    color: var(--gold);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .option-btn {
+    text-align: left;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #475569;
+    background: #0f172a;
+    color: var(--text);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: #1e293b;
+  }
+
+  .option-btn.correct {
+    background: rgba(34, 197, 94, 0.25);
+    border-color: #22c55e;
+    color: #86efac;
+  }
+
+  .option-btn.wrong {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: #ef4444;
+    color: #fca5a5;
+  }
+
+  .quiz-feedback {
+    padding: 10px 12px;
+    border-radius: 9px;
+    background: rgba(15, 23, 42, 0.9);
+    font-size: 0.86rem;
+    line-height: 1.4;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  /* Player Count Selector (1 to 6) */
+  .count-selector {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin: 8px 0 14px;
+  }
+
+  @media (max-width: 540px) {
+    .count-selector { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .count-btn {
+    padding: 8px 6px;
+    border-radius: 8px;
+    border: 1.5px solid #475569;
+    background: #0f172a;
+    color: var(--text);
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+  }
+
+  .count-btn.active {
+    border-color: var(--accent);
+    background: rgba(56, 189, 248, 0.22);
+    color: #38bdf8;
+  }
+
+  /* Separate Name & Class Input Cards */
+  .setup-players-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .setup-players-grid.single-col {
+    grid-template-columns: 1fr;
+  }
+
+  @media (max-width: 540px) {
+    .setup-players-grid { grid-template-columns: 1fr; }
+  }
+
+  .setup-player-card {
+    background: #0f172a;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .setup-player-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .field-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .field-row label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .field-row input {
+    width: 100%;
+    background: #1e293b;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    padding: 6px 9px;
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    outline: none;
+  }
+
+  .field-row input:focus {
+    border-color: var(--accent);
+  }
+
+  /* Admin Table & Controls */
+  .admin-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    margin: 12px 0;
+    padding: 10px;
+    background: #0f172a;
+    border-radius: 10px;
+    border: 1px solid #334155;
+  }
+
+  .admin-filter-input {
+    background: #1e293b;
+    border: 1px solid #475569;
+    border-radius: 7px;
+    padding: 7px 11px;
+    color: white;
+    font-size: 0.86rem;
+    min-width: 210px;
+    outline: none;
+  }
+
+  .table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid #334155;
+    margin-bottom: 14px;
+  }
+
+  table.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    text-align: left;
+  }
+
+  table.admin-table th {
+    background: #0f172a;
+    color: var(--accent);
+    padding: 10px 12px;
+    font-weight: 800;
+    border-bottom: 1px solid #334155;
+    white-space: nowrap;
+  }
+
+  table.admin-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.45);
+    color: #f1f5f9;
+  }
+
+  table.admin-table tr:nth-child(even) {
+    background: rgba(15, 23, 42, 0.45);
+  }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.84rem;
+    padding-top: 8px;
+    border-top: 1px solid #334155;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚛️ Periodic Table Snakes & Ladders — Chemistry KSSM Edition</h1>
+  <p>Form 4 & Form 5 Chemistry Syllabus • Solo (1P) or Group (2–6P) • +10 Points per Correct Answer</p>
+</header>
+
+<!-- Front Interface: Separate Student Name, Class, Points & Admin Login -->
+<div class="front-student-bar">
+  <div class="front-identity-group">
+    <div class="id-box">
+      <span class="id-label">Student Name:</span>
+      <span class="id-value" id="frontStudentName">➕ Student 1</span>
+    </div>
+    <div class="id-box">
+      <span class="id-label">Class:</span>
+      <span class="id-value" id="frontStudentClass">4 Amanah</span>
+    </div>
+  </div>
+
+  <div class="front-actions-group">
+    <span class="stat-chip" id="frontStudentPoints">⭐ Points: 0</span>
+    <span class="stat-chip green" id="frontCorrectCount">✅ Correct Qs: 0</span>
+    <button class="btn btn-success" onclick="downloadResultsCSV()" title="Download CSV of student marks and correctly answered questions">
+      📥 Download Data (CSV)
+    </button>
+    <button class="btn btn-admin" onclick="openAdminLogin()" title="Teacher / Admin Login to inspect all student marks">
+      🔐 Admin Login
+    </button>
+  </div>
+</div>
+
+<div class="main-container">
+  <!-- Game Board -->
+  <div class="board-wrapper" id="boardWrapper">
+    <div class="board-grid" id="boardGrid"></div>
+    <svg class="overlay-svg" id="overlaySvg" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+    <div class="tokens-layer" id="tokensLayer"></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Turn & Dice Card -->
+    <div class="card">
+      <h2>
+        <span>🎲 Dice & Turn Control</span>
+        <button class="btn btn-secondary" onclick="openSetupModal()">✏️ Students / New Game</button>
+      </h2>
+      <div class="dice-area">
+        <div class="dice-box" id="diceDisplay">🎲</div>
+        <div style="flex:1;">
+          <button class="btn btn-primary" id="rollBtn" onclick="handleRoll()">Roll Dice (Space)</button>
+          <div style="font-size:0.76rem; color:var(--muted); margin-top:5px; text-align:center;">
+            Each correct KSSM answer awards <strong>+10 Points</strong>!
+          </div>
+        </div>
+      </div>
+      <div class="status-log" id="statusLog">
+        Enter Student Name and Class, then click Start Game!
+      </div>
+      <div class="toggle-row">
+        <span>🧪 KSSM Quiz on Ladders & Snakes</span>
+        <input type="checkbox" id="quizToggle" checked style="width:18px; height:18px; cursor:pointer;" />
+      </div>
+      <div class="toggle-row">
+        <span>🔊 Sound Effects</span>
+        <input type="checkbox" id="soundToggle" checked style="width:18px; height:18px; cursor:pointer;" />
+      </div>
+    </div>
+
+    <!-- Students Scoreboard -->
+    <div class="card">
+      <h2>
+        <span>🏆 Student Scoreboard</span>
+        <span id="turnCounter" style="font-size:0.78rem; color:var(--muted);">Round 1</span>
+      </h2>
+      <div class="player-list" id="playerList"></div>
+    </div>
+
+    <!-- Element Inspector -->
+    <div class="card">
+      <h2><span>🔬 Element Inspector</span><span style="font-size:0.74rem; color:var(--muted);">Click any tile</span></h2>
+      <div class="inspector-grid">
+        <div class="inspector-tile cat-nonmetal" id="inspTile">
+          <div class="num" id="inspNum">1</div>
+          <div class="sym" id="inspSym">H</div>
+          <div class="mass" id="inspMass">1.008</div>
+        </div>
+        <div class="inspector-details">
+          <h3 id="inspName">Hydrogen (Non-metal)</h3>
+          <p id="inspFact">Lightest element in the universe; forms diatomic H₂ gas and burns with a 'pop' sound.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="card">
+      <h2><span>🗺️ Board Guide</span></h2>
+      <div style="font-size:0.78rem; margin-bottom:8px; display:flex; gap:12px;">
+        <span>🪜 <strong>Green Ladder:</strong> +10 pts & climb!</span>
+        <span>🐍 <strong>Red Snake:</strong> +10 pts & block!</span>
+      </div>
+      <div class="legend-grid">
+        <div class="legend-item"><span class="legend-swatch cat-alkali"></span>Alkali Metals (Group 1)</div>
+        <div class="legend-item"><span class="legend-swatch cat-alkaline"></span>Alkaline Earth (Group 2)</div>
+        <div class="legend-item"><span class="legend-swatch cat-transition"></span>Transition Elements</div>
+        <div class="legend-item"><span class="legend-swatch cat-halogen"></span>Halogens (Group 17)</div>
+        <div class="legend-item"><span class="legend-swatch cat-noble"></span>Noble Gases (Group 18)</div>
+        <div class="legend-item"><span class="legend-swatch cat-nonmetal"></span>Reactive Non-metals</div>
+        <div class="legend-item"><span class="legend-swatch cat-metalloid"></span>Metalloids</div>
+        <div class="legend-item"><span class="legend-swatch cat-post"></span>Post-transition / Lan / Act</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Front Student Registration Modal (1 to 6 Players, Separate Name & Class) -->
+<div class="modal-backdrop" id="setupModal">
+  <div class="modal-card">
+    <div class="modal-header-row">
+      <span class="modal-badge badge-setup">Student Registration</span>
+      <button class="btn btn-admin" style="padding:6px 11px; font-size:0.78rem;" onclick="openAdminLogin()">🔐 Admin Login (Check Marks)</button>
+    </div>
+    <h3>Select Number of Players (1 to 6 Students)</h3>
+    <p style="font-size:0.84rem; color:var(--muted);">
+      Play solo (1 Player) or in a group (up to 6 Students). Enter each student's <strong>Name</strong> and <strong>Class</strong> separately below.
+    </p>
+
+    <div style="font-size:0.8rem; font-weight:700; color:var(--muted); margin-top:10px;">Number of Players:</div>
+    <div class="count-selector" id="countSelector">
+      <button class="count-btn active" data-count="1" onclick="selectPlayerCount(1)">1 Player</button>
+      <button class="count-btn" data-count="2" onclick="selectPlayerCount(2)">2 Players</button>
+      <button class="count-btn" data-count="3" onclick="selectPlayerCount(3)">3 Players</button>
+      <button class="count-btn" data-count="4" onclick="selectPlayerCount(4)">4 Players</button>
+      <button class="count-btn" data-count="5" onclick="selectPlayerCount(5)">5 Players</button>
+      <button class="count-btn" data-count="6" onclick="selectPlayerCount(6)">6 Players</button>
+    </div>
+
+    <div class="setup-players-grid single-col" id="setupPlayersGrid"></div>
+    <button class="btn btn-primary" onclick="startGame()">🚀 Start Chemistry Game</button>
+  </div>
+</div>
+
+<!-- Admin Password Login Modal -->
+<div class="modal-backdrop hidden" id="adminLoginModal">
+  <div class="modal-card" style="max-width:420px;">
+    <div class="modal-header-row">
+      <span class="modal-badge badge-admin">Teacher / Admin Access</span>
+      <button class="btn btn-secondary" onclick="closeAdminLogin()">✕ Close</button>
+    </div>
+    <h3>🔐 Admin Marks Portal Login</h3>
+    <p style="font-size:0.84rem; color:var(--muted); margin-bottom:12px;">
+      Enter the teacher password to view student marks, filter by class, and download CSV reports.
+    </p>
+    <div class="field-row" style="margin-bottom:10px;">
+      <label for="adminPasswordInput">Admin Password</label>
+      <input type="password" id="adminPasswordInput" placeholder="Enter password (default: kimia123)" onkeydown="if(event.key==='Enter') verifyAdminPassword();" />
+    </div>
+    <div id="adminLoginError" style="color:#f87171; font-size:0.82rem; font-weight:700; margin-bottom:10px; display:none;">
+      ❌ Incorrect password! Hint: default password is <strong>kimia123</strong>
+    </div>
+    <button class="btn btn-admin" style="width:100%;" onclick="verifyAdminPassword()">🔓 Unlock Student Marks</button>
+  </div>
+</div>
+
+<!-- Admin Dashboard Modal -->
+<div class="modal-backdrop hidden" id="adminDashboardModal">
+  <div class="modal-card wide">
+    <div class="modal-header-row">
+      <span class="modal-badge badge-admin">Teacher / Admin Marks Dashboard</span>
+      <button class="btn btn-secondary" onclick="document.getElementById('adminDashboardModal').classList.add('hidden')">✕ Close Dashboard</button>
+    </div>
+    <h3>📊 Student Marks & Correctly Answered KSSM Questions</h3>
+    <p style="font-size:0.84rem; color:var(--muted);">
+      Displays live session marks plus saved student records from previous games on this device.
+    </p>
+
+    <div class="admin-toolbar">
+      <input type="text" id="adminSearchInput" class="admin-filter-input" placeholder="🔍 Filter by Student Name or Class..." oninput="renderAdminDashboard()" />
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-success" onclick="downloadAdminAllCSV()">📥 Download All Records (CSV)</button>
+        <button class="btn btn-danger" onclick="clearSavedAdminRecords()">🗑️ Clear Saved History</button>
+      </div>
+    </div>
+
+    <h4 style="font-size:0.92rem; color:var(--gold); margin-bottom:6px;">1. Student Marks Summary</h4>
+    <div class="table-scroll">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Student Name</th>
+            <th>Class</th>
+            <th>Correct Qs</th>
+            <th>Attempted</th>
+            <th>Marks (Points)</th>
+            <th>Position</th>
+            <th>Status / Date</th>
+          </tr>
+        </thead>
+        <tbody id="adminSummaryBody"></tbody>
+      </table>
+    </div>
+
+    <h4 style="font-size:0.92rem; color:#4ade80; margin-bottom:6px;">2. Correctly Answered Questions Log</h4>
+    <div class="table-scroll" style="max-height:240px;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Student Name</th>
+            <th>Class</th>
+            <th>KSSM Topic</th>
+            <th>Question Correctly Answered</th>
+            <th>Answer</th>
+            <th>Points</th>
+          </tr>
+        </thead>
+        <tbody id="adminQuestionsBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- KSSM Quiz Modal -->
+<div class="modal-backdrop hidden" id="quizModal">
+  <div class="modal-card">
+    <span class="modal-badge" id="quizBadge">Chemical Bond Ladder</span>
+    <div class="quiz-meta" id="quizStudentBanner">Student: Student 1 (4 Amanah) • +10 Points</div>
+    <div class="quiz-meta" id="quizTopic" style="color:#38bdf8;">Form 4 • Chapter 5: Chemical Bonds</div>
+    <h3 id="quizQuestion">Question text goes here?</h3>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <button class="btn btn-primary hidden" id="quizContinueBtn" onclick="closeQuizAndApply()">Continue Turn ➔</button>
+  </div>
+</div>
+
+<!-- Winner Modal -->
+<div class="modal-backdrop hidden" id="winnerModal">
+  <div class="modal-card" style="text-align:center;">
+    <div style="font-size:3rem; margin-bottom:8px;">🏆⚗️🎉</div>
+    <span class="modal-badge badge-ladder">Champion Chemist!</span>
+    <h3 id="winnerTitle" style="font-size:1.45rem; margin-bottom:8px;">Student 1 Wins!</h3>
+    <p id="winnerSubtitle" style="font-size:0.9rem; color:var(--muted); margin-bottom:16px;">
+      Reached Element 100 (Fermium) and mastered Chemistry KSSM!
+    </p>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <button class="btn btn-success" style="width:100%;" onclick="downloadResultsCSV()">📥 Download Correctly Answered Questions & Marks (CSV)</button>
+      <button class="btn btn-primary" onclick="document.getElementById('winnerModal').classList.add('hidden'); openSetupModal();">Play Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 1. Elements 1 - 100 Data
+const ELEMENTS = [
+  null,
+  {z:1,s:"H",n:"Hydrogen",m:"1.008",c:"cat-nonmetal",f:"Group 1 / Non-metal: Burns with a 'pop' sound when tested with a lighted wooden splinter."},
+  {z:2,s:"He",n:"Helium",m:"4.003",c:"cat-noble",f:"Group 18 Noble Gas: Duplet electron arrangement (2); used to fill weather balloons."},
+  {z:3,s:"Li",n:"Lithium",m:"6.94",c:"cat-alkali",f:"Group 1 Alkali Metal: Floats and moves slowly on water surface to form LiOH and H₂ gas."},
+  {z:4,s:"Be",n:"Beryllium",m:"9.012",c:"cat-alkaline",f:"Group 2 Alkaline Earth Metal: Lightweight metal used in aerospace alloys."},
+  {z:5,s:"B",n:"Boron",m:"10.81",c:"cat-metalloid",f:"Metalloid: Used in borosilicate glass (Pyrex) for laboratory apparatus."},
+  {z:6,s:"C",n:"Carbon",m:"12.01",c:"cat-nonmetal",f:"Basis of organic chemistry (Form 5 Carbon Compounds); standard for Relative Atomic Mass (C-12)."},
+  {z:7,s:"N",n:"Nitrogen",m:"14.01",c:"cat-nonmetal",f:"Makes up 78% of air; reacts with H₂ in the Haber Process to manufacture ammonia (NH₃)."},
+  {z:8,s:"O",n:"Oxygen",m:"16.00",c:"cat-nonmetal",f:"Relights a glowing wooden splinter; essential for combustion and rusting of iron."},
+  {z:9,s:"F",n:"Fluorine",m:"19.00",c:"cat-halogen",f:"Most reactive halogen in Group 17; pale yellow gas."},
+  {z:10,s:"Ne",n:"Neon",m:"20.18",c:"cat-noble",f:"Group 18 Noble Gas: Octet arrangement (2.8); glows reddish-orange in advertising signs."},
+  {z:11,s:"Na",n:"Sodium",m:"22.99",c:"cat-alkali",f:"Group 1 Alkali Metal: Stored in paraffin oil; reacts vigorously with water to form NaOH + H₂."},
+  {z:12,s:"Mg",n:"Magnesium",m:"24.31",c:"cat-alkaline",f:"Burns in oxygen with a bright white flame to form basic white magnesium oxide (MgO)."},
+  {z:13,s:"Al",n:"Aluminium",m:"26.98",c:"cat-post",f:"Forms an amphoteric oxide (Al₂O₃) that reacts with both acids and alkalis."},
+  {z:14,s:"Si",n:"Silicon",m:"28.09",c:"cat-metalloid",f:"Metalloid in Period 3: Used to make microchips and semiconductors."},
+  {z:15,s:"P",n:"Phosphorus",m:"30.97",c:"cat-nonmetal",f:"Period 3 non-metal: Forms acidic oxides P₄O₁₀."},
+  {z:16,s:"S",n:"Sulfur",m:"32.06",c:"cat-nonmetal",f:"Raw material in the Contact Process to manufacture sulfuric acid (H₂SO₄)."},
+  {z:17,s:"Cl",n:"Chlorine",m:"35.45",c:"cat-halogen",f:"Group 17 Halogen: Greenish-yellow gas; turns moist blue litmus paper red then bleaches it."},
+  {z:18,s:"Ar",n:"Argon",m:"39.95",c:"cat-noble",f:"Group 18 Noble Gas (2.8.8): Inert gas used to fill filament bulbs to prevent tungsten oxidation."},
+  {z:19,s:"K",n:"Potassium",m:"39.10",c:"cat-alkali",f:"Group 1 Alkali Metal: Burns with a lilac flame when reacting with water."},
+  {z:20,s:"Ca",n:"Calcium",m:"40.08",c:"cat-alkaline",f:"Ca(OH)₂ (limewater) turns chalky/cloudy when carbon dioxide gas is bubbled through it."},
+  {z:21,s:"Sc",n:"Scandium",m:"44.96",c:"cat-transition",f:"First transition element in Period 4."},
+  {z:22,s:"Ti",n:"Titanium",m:"47.87",c:"cat-transition",f:"Transition metal: High strength-to-weight ratio and corrosion resistant."},
+  {z:23,s:"V",n:"Vanadium",m:"50.94",c:"cat-transition",f:"Vanadium(V) oxide (V₂O₅) is the catalyst used in the Contact Process."},
+  {z:24,s:"Cr",n:"Chromium",m:"52.00",c:"cat-transition",f:"Added to iron and carbon to make rust-resistant stainless steel; Cr₂O₇²⁻ is orange."},
+  {z:25,s:"Mn",n:"Manganese",m:"54.94",c:"cat-transition",f:"Acidified KMnO₄ (purple) is a strong oxidizing agent that decolourises in redox reactions."},
+  {z:26,s:"Fe",n:"Iron",m:"55.85",c:"cat-transition",f:"Catalyst in Haber Process; shows variable oxidation numbers (+2 green, +3 brown)."},
+  {z:27,s:"Co",n:"Cobalt",m:"58.93",c:"cat-transition",f:"Transition metal: Cobalt(II) chloride paper turns from blue to pink in the presence of water."},
+  {z:28,s:"Ni",n:"Nickel",m:"58.69",c:"cat-transition",f:"Catalyst at 180°C in the hydrogenation of unsaturated vegetable oils to margarine."},
+  {z:29,s:"Cu",n:"Copper",m:"63.55",c:"cat-transition",f:"Cu²⁺ ions give blue aqueous solutions; main component of bronze (Cu+Sn) and brass (Cu+Zn)."},
+  {z:30,s:"Zn",n:"Zinc",m:"65.38",c:"cat-transition",f:"Used to galvanise iron (sacrificial protection); ZnO is yellow when hot, white when cold."},
+  {z:31,s:"Ga",n:"Gallium",m:"69.72",c:"cat-post",f:"Post-transition metal with a low melting point of 29.8°C."},
+  {z:32,s:"Ge",n:"Germanium",m:"72.63",c:"cat-metalloid",f:"Group 14 metalloid used in fiber-optic systems."},
+  {z:33,s:"As",n:"Arsenic",m:"74.92",c:"cat-metalloid",f:"Group 15 metalloid known for its toxicity."},
+  {z:34,s:"Se",n:"Selenium",m:"78.97",c:"cat-nonmetal",f:"Group 16 non-metal used in photocells."},
+  {z:35,s:"Br",n:"Bromine",m:"79.90",c:"cat-halogen",f:"Reddish-brown liquid halogen at room temperature; decolourises when shaken with alkenes."},
+  {z:36,s:"Kr",n:"Krypton",m:"83.80",c:"cat-noble",f:"Group 18 Noble Gas used in high-speed photographic flashes."},
+  {z:37,s:"Rb",n:"Rubidium",m:"85.47",c:"cat-alkali",f:"Group 1 Alkali Metal: More reactive than potassium because valence electron is further from nucleus."},
+  {z:38,s:"Sr",n:"Strontium",m:"87.62",c:"cat-alkaline",f:"Group 2 metal that produces a crimson red flame in fireworks."},
+  {z:39,s:"Y",n:"Yttrium",m:"88.91",c:"cat-transition",f:"Transition metal used in LED phosphors."},
+  {z:40,s:"Zr",n:"Zirconium",m:"91.22",c:"cat-transition",f:"Corrosion-resistant transition metal used in nuclear reactors."},
+  {z:41,s:"Nb",n:"Niobium",m:"92.91",c:"cat-transition",f:"Used in superconducting magnets."},
+  {z:42,s:"Mo",n:"Molybdenum",m:"95.95",c:"cat-transition",f:"High-melting transition metal used to strengthen steel alloys."},
+  {z:43,s:"Tc",n:"Technetium",m:"(98)",c:"cat-transition",f:"First artificially produced radioactive transition element."},
+  {z:44,s:"Ru",n:"Ruthenium",m:"101.1",c:"cat-transition",f:"Platinum-group transition metal catalyst."},
+  {z:45,s:"Rh",n:"Rhodium",m:"102.9",c:"cat-transition",f:"Used in catalytic converters in car exhausts to reduce NOₓ emissions."},
+  {z:46,s:"Pd",n:"Palladium",m:"106.4",c:"cat-transition",f:"Catalyst in catalytic converters and hydrogenation."},
+  {z:47,s:"Ag",n:"Silver",m:"107.9",c:"cat-transition",f:"Ag⁺ ions react with Cl⁻ ions to form a white precipitate of silver chloride (AgCl)."},
+  {z:48,s:"Cd",n:"Cadmium",m:"112.4",c:"cat-transition",f:"Used in rechargeable Ni-Cd batteries."},
+  {z:49,s:"In",n:"Indium",m:"114.8",c:"cat-post",f:"Used in indium tin oxide (ITO) touchscreens."},
+  {z:50,s:"Sn",n:"Tin",m:"118.7",c:"cat-post",f:"Main metal in pewter (95% Sn, Cu, Sb) and solder (Sn + Pb)."},
+  {z:51,s:"Sb",n:"Antimony",m:"121.8",c:"cat-metalloid",f:"Added to pewter to harden the tin alloy."},
+  {z:52,s:"Te",n:"Tellurium",m:"127.6",c:"cat-metalloid",f:"Metalloid used in thermoelectric devices."},
+  {z:53,s:"I",n:"Iodine",m:"126.9",c:"cat-halogen",f:"Group 17 Halogen: Purplish-black solid at room temperature that sublimes when heated."},
+  {z:54,s:"Xe",n:"Xenon",m:"131.3",c:"cat-noble",f:"Group 18 Noble Gas used in high-intensity headlamps."},
+  {z:55,s:"Cs",n:"Caesium",m:"132.9",c:"cat-alkali",f:"Extremely reactive Group 1 Alkali Metal; atomic radius increases down Group 1."},
+  {z:56,s:"Ba",n:"Barium",m:"137.3",c:"cat-alkaline",f:"Ba²⁺ ions react with SO₄²⁻ ions to form an insoluble white precipitate of BaSO₄."},
+  {z:57,s:"La",n:"Lanthanum",m:"138.9",c:"cat-lanthanide",f:"First element of the Lanthanide series."},
+  {z:58,s:"Ce",n:"Cerium",m:"140.1",c:"cat-lanthanide",f:"Lanthanide used in lighter flints and glass polishing."},
+  {z:59,s:"Pr",n:"Praseodymium",m:"140.9",c:"cat-lanthanide",f:"Lanthanide used to colour glass green."},
+  {z:60,s:"Nd",n:"Neodymium",m:"144.2",c:"cat-lanthanide",f:"Used to make powerful permanent magnets."},
+  {z:61,s:"Pm",n:"Promethium",m:"(145)",c:"cat-lanthanide",f:"Radioactive lanthanide element."},
+  {z:62,s:"Sm",n:"Samarium",m:"150.4",c:"cat-lanthanide",f:"Used in samarium-cobalt magnets."},
+  {z:63,s:"Eu",n:"Europium",m:"152.0",c:"cat-lanthanide",f:"Used in red phosphors for display screens."},
+  {z:64,s:"Gd",n:"Gadolinium",m:"157.3",c:"cat-lanthanide",f:"Used as a contrast agent in MRI medical scans."},
+  {z:65,s:"Tb",n:"Terbium",m:"158.9",c:"cat-lanthanide",f:"Used in green phosphors in fluorescent lamps."},
+  {z:66,s:"Dy",n:"Dysprosium",m:"162.5",c:"cat-lanthanide",f:"Lanthanide used in wind turbine magnets."},
+  {z:67,s:"Ho",n:"Holmium",m:"164.9",c:"cat-lanthanide",f:"Has the highest magnetic strength of any element."},
+  {z:68,s:"Er",n:"Erbium",m:"167.3",c:"cat-lanthanide",f:"Used in optical fiber amplifiers."},
+  {z:69,s:"Tm",n:"Thulium",m:"168.9",c:"cat-lanthanide",f:"Used in portable X-ray devices."},
+  {z:70,s:"Yb",n:"Ytterbium",m:"173.0",c:"cat-lanthanide",f:"Used in high-precision atomic clocks."},
+  {z:71,s:"Lu",n:"Lutetium",m:"175.0",c:"cat-lanthanide",f:"Final element of the Lanthanide series."},
+  {z:72,s:"Hf",n:"Hafnium",m:"178.5",c:"cat-transition",f:"Used in nuclear control rods."},
+  {z:73,s:"Ta",n:"Tantalum",m:"180.9",c:"cat-transition",f:"Used in electronic capacitors in smartphones."},
+  {z:74,s:"W",n:"Tungsten",m:"183.8",c:"cat-transition",f:"Highest melting point of all metals (3422°C); used in bulb filaments."},
+  {z:75,s:"Re",n:"Rhenium",m:"186.2",c:"cat-transition",f:"Used in high-temperature jet engine superalloys."},
+  {z:76,s:"Os",n:"Osmium",m:"190.2",c:"cat-transition",f:"Densest naturally occurring element."},
+  {z:77,s:"Ir",n:"Iridium",m:"192.2",c:"cat-transition",f:"Extremely corrosion-resistant transition metal."},
+  {z:78,s:"Pt",n:"Platinum",m:"195.1",c:"cat-transition",f:"Inert electrode in electrolysis & fuel cells; catalyst in Ostwald Process."},
+  {z:79,s:"Au",n:"Gold",m:"197.0",c:"cat-transition",f:"Lowest reactivity metal; found uncombined in nature."},
+  {z:80,s:"Hg",n:"Mercury",m:"200.6",c:"cat-transition",f:"Only metal that is liquid at room temperature."},
+  {z:81,s:"Tl",n:"Thallium",m:"204.4",c:"cat-post",f:"Heavy post-transition metal."},
+  {z:82,s:"Pb",n:"Lead",m:"207.2",c:"cat-post",f:"Pb²⁺ forms a yellow precipitate with I⁻ (PbI₂) and white precipitate with SO₄²⁻ (PbSO₄)."},
+  {z:83,s:"Bi",n:"Bismuth",m:"209.0",c:"cat-post",f:"Used in low-melting safety alloys."},
+  {z:84,s:"Po",n:"Polonium",m:"(209)",c:"cat-metalloid",f:"Radioactive element discovered by Marie and Pierre Curie."},
+  {z:85,s:"At",n:"Astatine",m:"(210)",c:"cat-halogen",f:"Rarest naturally occurring radioactive halogen in Group 17."},
+  {z:86,s:"Rn",n:"Radon",m:"(222)",c:"cat-noble",f:"Radioactive Group 18 Noble Gas."},
+  {z:87,s:"Fr",n:"Francium",m:"(223)",c:"cat-alkali",f:"Most reactive radioactive alkali metal in Group 1."},
+  {z:88,s:"Ra",n:"Radium",m:"(226)",c:"cat-alkaline",f:"Radioactive Group 2 alkaline earth metal."},
+  {z:89,s:"Ac",n:"Actinium",m:"(227)",c:"cat-actinide",f:"First element of the Actinide series."},
+  {z:90,s:"Th",n:"Thorium",m:"232.0",c:"cat-actinide",f:"Actinide metal used in gas mantles."},
+  {z:91,s:"Pa",n:"Protactinium",m:"231.0",c:"cat-actinide",f:"Dense, radioactive actinide metal."},
+  {z:92,s:"U",n:"Uranium",m:"238.0",c:"cat-actinide",f:"Radioactive fuel used in nuclear fission reactors."},
+  {z:93,s:"Np",n:"Neptunium",m:"(237)",c:"cat-actinide",f:"First synthetic transuranium actinide element."},
+  {z:94,s:"Pu",n:"Plutonium",m:"(244)",c:"cat-actinide",f:"Radioactive actinide used in nuclear energy."},
+  {z:95,s:"Am",n:"Americium",m:"(243)",c:"cat-actinide",f:"Used in tiny amounts in household smoke detectors."},
+  {z:96,s:"Cm",n:"Curium",m:"(247)",c:"cat-actinide",f:"Named after Marie and Pierre Curie."},
+  {z:97,s:"Bk",n:"Berkelium",m:"(247)",c:"cat-actinide",f:"Synthetic actinide named after Berkeley, California."},
+  {z:98,s:"Cf",n:"Californium",m:"(251)",c:"cat-actinide",f:"Strong neutron emitter used in metal detectors."},
+  {z:99,s:"Es",n:"Einsteinium",m:"(252)",c:"cat-actinide",f:"Named in honour of Albert Einstein."},
+  {z:100,s:"Fm",n:"Fermium",m:"(257)",c:"cat-actinide",f:"Goal Tile 100! Named after nuclear physicist Enrico Fermi."}
+];
+
+// 2. Ladders & Snakes
+const LADDERS = {
+  3:  { to: 22, label: "Ionic Bond (LiF)" },
+  8:  { to: 26, label: "Haber Catalyst (Fe)" },
+  16: { to: 34, label: "Contact Process (H₂SO₄)" },
+  29: { to: 50, label: "Bronze Alloy (Cu + Sn)" },
+  42: { to: 63, label: "Catalytic Surge" },
+  54: { to: 74, label: "High Melting Filament (W)" },
+  67: { to: 86, label: "Noble Stability (Rn)" },
+  78: { to: 96, label: "Fuel Cell Boost (Pt)" }
+};
+
+const SNAKES = {
+  19: { to: 4,  label: "Alkali Explosion in Water!" },
+  35: { to: 14, label: "Bromine Addition Loss" },
+  48: { to: 27, label: "Heavy Metal Toxicity" },
+  62: { to: 39, label: "Acid Corrosion Spill" },
+  73: { to: 51, label: "Incomplete Combustion" },
+  84: { to: 59, label: "Alpha Decay Emission" },
+  92: { to: 68, label: "Nuclear Fission Split!" },
+  98: { to: 79, label: "Radioactive Overheat!" }
+};
+
+// 3. Chemistry KSSM Form 4 & Form 5 Syllabus Question Bank (44 Questions)
+const KSSM_QUESTIONS = [
+  { topic: "Form 4 • Chap 2: Atomic Structure", q: "Which subatomic particle determines the identity (proton number) of an element?", opts: ["Neutron", "Proton", "Electron", "Nucleon"], ans: 1, exp: "The proton number (atomic number) defines each element in the Periodic Table." },
+  { topic: "Form 4 • Chap 2: Atomic Structure", q: "Isotopes of an element have the same number of protons but different numbers of:", opts: ["Electrons", "Valence shells", "Neutrons", "Valence electrons"], ans: 2, exp: "Isotopes have identical chemical properties (same electrons) but different physical properties due to different neutron numbers." },
+  { topic: "Form 4 • Chap 2: Atomic Structure", q: "What is the electron arrangement of a chlorine atom (Proton number = 17)?", opts: ["2.8.5", "2.8.7", "2.8.8", "2.7.8"], ans: 1, exp: "Chlorine has 17 electrons arranged across 3 shells: 2 in the first, 8 in the second, and 7 valence electrons." },
+  { topic: "Form 4 • Chap 2: Atomic Structure", q: "During the melting of naphthalene, temperature remains constant because heat energy absorbed is used to:", opts: ["Break covalent bonds", "Overcome intermolecular forces of attraction", "Increase kinetic energy of particles", "Ionize the molecules"], ans: 1, exp: "Latent heat of fusion overcomes attractive forces between molecules without increasing average kinetic energy." },
+  { topic: "Form 4 • Chap 3: Mole Concept", q: "What is the molar volume of any gas at room conditions (25°C, 1 atm)?", opts: ["22.4 dm³ mol⁻¹", "24.0 dm³ mol⁻¹", "6.02 × 10²³ dm³", "12.0 dm³ mol⁻¹"], ans: 1, exp: "At room conditions, 1 mole of any gas occupies 24 dm³ (whereas at STP it is 22.4 dm³)." },
+  { topic: "Form 4 • Chap 3: Mole Concept", q: "Calculate the relative molecular mass (RMM) of CO₂. [RAM: C = 12, O = 16]", opts: ["28", "32", "44", "48"], ans: 2, exp: "RMM of CO₂ = 12 + 2(16) = 44." },
+  { topic: "Form 4 • Chap 3: Mole Concept", q: "How many molecules are present in 0.5 mol of water (H₂O)? [Nₐ = 6.02 × 10²³ mol⁻¹]", opts: ["3.01 × 10²³", "6.02 × 10²³", "1.204 × 10²⁴", "1.505 × 10²³"], ans: 0, exp: "Number of particles = 0.5 mol × 6.02 × 10²³ = 3.01 × 10²³ molecules." },
+  { topic: "Form 4 • Chap 3: Chemical Formulae", q: "What is the correct chemical formula for aluminium oxide?", opts: ["AlO", "AlO₂", "Al₂O₃", "Al₃O₂"], ans: 2, exp: "Al³⁺ and O²⁻ combine in a 2:3 ratio to form neutral Al₂O₃." },
+  { topic: "Form 4 • Chap 4: Periodic Table", q: "Going down Group 1 (Li → Na → K), reactivity with water increases because:", opts: ["Atomic radius decreases", "Valence electron is further from the nucleus and more easily donated", "Electronegativity increases", "Melting point increases"], ans: 1, exp: "More occupied shells increase atomic size and weaken nuclear attraction on the single valence electron." },
+  { topic: "Form 4 • Chap 4: Periodic Table", q: "Why are Group 18 elements (Noble Gases) chemically unreactive (inert)?", opts: ["They are gases at room temperature", "They have achieved stable duplet or octet electron arrangements", "They have high densities", "They form diatomic molecules"], ans: 1, exp: "Full valence shells (2 for He; 8 for Ne, Ar, Kr, Xe, Rn) mean they do not donate, accept, or share electrons." },
+  { topic: "Form 4 • Chap 4: Periodic Table", q: "Going down Group 17 (Cl₂ → Br₂ → I₂), reactivity decreases because:", opts: ["Atomic size increases, making it harder to attract an electron", "Number of valence electrons decreases", "They become metals", "Density decreases"], ans: 0, exp: "Larger atomic radius weakens the nucleus's pull to attract one extra electron into the valence shell." },
+  { topic: "Form 4 • Chap 4: Periodic Table", q: "Which Period 3 oxide is amphoteric (reacts with both acids and alkalis)?", opts: ["Na₂O", "MgO", "Al₂O₃", "SO₂"], ans: 2, exp: "Across Period 3, oxides change from basic (Na₂O, MgO) → amphoteric (Al₂O₃) → acidic (SiO₂, P₄O₁₀, SO₂)." },
+  { topic: "Form 4 • Chap 4: Transition Elements", q: "Which of the following is a special characteristic of transition elements?", opts: ["Low melting points", "Form coloured ions or compounds", "Always have +1 oxidation number", "Soft enough to cut with a knife"], ans: 1, exp: "Transition elements form coloured ions (e.g., Cu²⁺ blue, Fe²⁺ green), show variable oxidation states, and act as catalysts." },
+  { topic: "Form 4 • Chap 5: Chemical Bonds", q: "An ionic bond is formed between:", opts: ["Two non-metal atoms sharing electrons", "A metal atom donating electrons and a non-metal atom accepting electrons", "Two metal atoms pooling electrons", "Two noble gas atoms"], ans: 1, exp: "Electrostatic attraction between oppositely charged cations (metals) and anions (non-metals) forms ionic bonds." },
+  { topic: "Form 4 • Chap 5: Chemical Bonds", q: "How many pairs of electrons are shared in a nitrogen molecule (N₂)?", opts: ["1 pair (single bond)", "2 pairs (double bond)", "3 pairs (triple bond)", "4 pairs"], ans: 2, exp: "Each nitrogen atom (2.5) needs 3 electrons, so two N atoms share 3 pairs to form a triple covalent bond (N≡N)." },
+  { topic: "Form 4 • Chap 5: Chemical Bonds", q: "Why do ionic compounds conduct electricity in the molten or aqueous state, but NOT as solids?", opts: ["They contain free-moving electrons", "Ions are free to move in molten/aqueous state but fixed in a lattice when solid", "Covalent bonds break when melted", "Water ionizes the metal atoms"], ans: 1, exp: "Mobile ions carry electric charge when melted or dissolved in water." },
+  { topic: "Form 4 • Chap 5: Chemical Bonds", q: "Which bond is responsible for the unusually high boiling point of water (H₂O) compared to H₂S?", opts: ["Ionic bond", "Metallic bond", "Hydrogen bond", "Dative bond"], ans: 2, exp: "Strong hydrogen bonds form between H atoms and highly electronegative O atoms of neighbouring H₂O molecules." },
+  { topic: "Form 4 • Chap 6: Acid, Base & Salt", q: "An acid is defined as a chemical substance that ionizes in water to produce:", opts: ["Hydroxide ions, OH⁻", "Hydrogen ions, H⁺", "Oxide ions, O²⁻", "Ammonium ions, NH₄⁺"], ans: 1, exp: "H⁺ ions (or hydroxonium ions, H₃O⁺) give acids their acidic properties in aqueous solution." },
+  { topic: "Form 4 • Chap 6: Acid, Base & Salt", q: "Which reagent confirms the presence of sulfate ions (SO₄²⁻) in an aqueous salt solution?", opts: ["Dilute HCl followed by BaCl₂ solution", "Dilute HNO₃ followed by AgNO₃ solution", "Sodium hydroxide solution", "Acidified KMnO₄ solution"], ans: 0, exp: "Ba²⁺ + SO₄²⁻ → BaSO₄ (insoluble white precipitate in dilute acid)." },
+  { topic: "Form 4 • Chap 6: Acid, Base & Salt", q: "Which gas turns moist red litmus paper blue and forms white fumes with concentrated HCl?", opts: ["Carbon dioxide, CO₂", "Hydrogen chloride, HCl", "Ammonia, NH₃", "Sulfur dioxide, SO₂"], ans: 2, exp: "Ammonia (NH₃) is an alkaline gas that turns red litmus blue." },
+  { topic: "Form 4 • Chap 6: Acid, Base & Salt", q: "Which method is best to prepare an insoluble salt such as lead(II) iodide (PbI₂)?", opts: ["Neutralisation", "Double decomposition (precipitation)", "Reaction of acid with metal oxide", "Crystallisation from excess metal"], ans: 1, exp: "Mixing two aqueous solutions containing Pb²⁺ and I⁻ (e.g., Pb(NO₃)₂ + KI) precipitates insoluble PbI₂." },
+  { topic: "Form 4 • Chap 7: Rate of Reaction", q: "How does a catalyst increase the rate of a chemical reaction?", opts: ["Increases kinetic energy of reactants", "Provides an alternative pathway with lower activation energy (Eₐ)", "Increases concentration of reactants", "Increases total yield of product"], ans: 1, exp: "Lower activation energy means a higher proportion of colliding particles achieve ≥ Eₐ, increasing effective collision frequency." },
+  { topic: "Form 4 • Chap 7: Rate of Reaction", q: "Using powdered calcium carbonate instead of marble chips increases reaction rate with HCl because:", opts: ["Activation energy is lowered", "Total exposed surface area is larger", "Temperature increases automatically", "HCl becomes a stronger acid"], ans: 1, exp: "Smaller particle size increases total surface area exposed to collisions per unit time." },
+  { topic: "Form 4 • Chap 8: Manufactured Substances", q: "Why is bronze (copper + tin) harder than pure copper?", opts: ["Tin atoms are the same size as copper atoms", "Foreign tin atoms disrupt the orderly arrangement of copper layers, preventing sliding", "Bronze has ionic bonds", "Tin lowers the density of copper"], ans: 1, exp: "Different-sized foreign atoms prevent layers of pure metal atoms from sliding easily when force is applied." },
+  { topic: "Form 4 • Chap 8: Manufactured Substances", q: "What are the optimum temperature, pressure, and catalyst in the Haber Process (N₂ + 3H₂ ⇌ 2NH₃)?", opts: ["450°C, 200 atm, Iron (Fe)", "200°C, 450 atm, V₂O₅", "450°C, 1 atm, Platinum", "180°C, 1 atm, Nickel"], ans: 0, exp: "Haber Process uses 450°C, 200 atm, and iron catalyst." },
+  { topic: "Form 4 • Chap 8: Manufactured Substances", q: "In the Contact Process, sulfur trioxide (SO₃) is dissolved in concentrated H₂SO₄ instead of water to form:", opts: ["Sulfurous acid", "Oleum (H₂S₂O₇)", "Ammonium sulfate", "Dilute sulfuric acid"], ans: 1, exp: "Direct reaction of SO₃ with water is violently exothermic and produces hazardous acid mist; dissolving in H₂SO₄ forms oleum." },
+  { topic: "Form 5 • Chap 1: Redox Equilibrium", q: "In terms of electron transfer, oxidation is defined as:", opts: ["Gain of electrons", "Loss of electrons", "Decrease in oxidation number", "Loss of oxygen"], ans: 1, exp: "OIL RIG: Oxidation Is Loss (of electrons), Reduction Is Gain (of electrons)." },
+  { topic: "Form 5 • Chap 1: Redox Equilibrium", q: "What is the oxidation number of chromium (Cr) in the dichromate(VI) ion, Cr₂O₇²⁻?", opts: ["+3", "+6", "+7", "+12"], ans: 1, exp: "2(Cr) + 7(-2) = -2 → 2(Cr) = +12 → Cr = +6." },
+  { topic: "Form 5 • Chap 1: Redox Equilibrium", q: "In a chemical cell (voltaic cell), electrons flow through the external wire from:", opts: ["Positive terminal (cathode) to negative terminal (anode)", "Negative terminal (more electropositive metal) to positive terminal", "Salt bridge to electrolyte", "Copper to zinc"], ans: 1, exp: "The more electropositive metal donates electrons (anode, negative terminal) towards the less electropositive metal (cathode, positive)." },
+  { topic: "Form 5 • Chap 1: Redox Equilibrium", q: "During the electrolysis of concentrated aqueous sodium chloride (brine) using carbon electrodes, what gas is released at the anode?", opts: ["Oxygen", "Hydrogen", "Chlorine", "Nitrogen"], ans: 2, exp: "Because Cl⁻ concentration is high, Cl⁻ ions are selectively discharged at the anode to produce chlorine gas (Cl₂)." },
+  { topic: "Form 5 • Chap 1: Redox Equilibrium", q: "Which metal protects iron from rusting via sacrificial protection when attached to an iron ship hull?", opts: ["Copper", "Tin", "Zinc or Magnesium", "Silver"], ans: 2, exp: "Metals more electropositive than iron (Mg, Zn) corrode preferentially by donating electrons to iron." },
+  { topic: "Form 5 • Chap 2: Carbon Compounds", q: "What is the general formula for the alkene homologous series?", opts: ["CₙH₂ₙ₊₂", "CₙH₂ₙ", "CₙH₂ₙ₋₂", "CₙH₂ₙ₊₁OH"], ans: 1, exp: "Alkenes are unsaturated hydrocarbons with at least one C=C double bond and general formula CₙH₂ₙ (n ≥ 2)." },
+  { topic: "Form 5 • Chap 2: Carbon Compounds", q: "Which chemical test distinguishes between hexane (alkane) and hexene (alkene)?", opts: ["Add water", "Shake with bromine water (brown → colourless for hexene)", "Test with blue litmus paper", "Add sodium carbonate"], ans: 1, exp: "Alkenes undergo addition reaction across the C=C double bond, decolourising reddish-brown bromine water." },
+  { topic: "Form 5 • Chap 2: Carbon Compounds", q: "Which ester is formed when ethanol reacts with ethanoic acid in the presence of concentrated H₂SO₄?", opts: ["Methyl ethanoate", "Ethyl methanoate", "Ethyl ethanoate", "Propyl ethanoate"], ans: 2, exp: "Ethanol + Ethanoic acid → Ethyl ethanoate (CH₃COOC₂H₅) + Water (sweet fruity smell)." },
+  { topic: "Form 5 • Chap 2: Carbon Compounds", q: "Oxidation of propan-1-ol by heating under reflux with acidified potassium dichromate(VI) produces:", opts: ["Propene", "Propanoic acid", "Propyl propanoate", "Propane"], ans: 1, exp: "Primary alcohols oxidize to carboxylic acids with the same number of carbon atoms." },
+  { topic: "Form 5 • Chap 3: Thermochemistry", q: "In an exothermic reaction, the temperature of the surroundings increases and ΔH is:", opts: ["Positive (+), because products have more energy than reactants", "Negative (-), because heat is released to the surroundings", "Zero", "Positive (+), because bond breaking exceeds bond formation"], ans: 1, exp: "Exothermic reactions release heat to the surroundings, so ΔH is negative." },
+  { topic: "Form 5 • Chap 3: Thermochemistry", q: "Why is the heat of neutralisation between ethanoic acid (weak acid) and NaOH less than -57.3 kJ mol⁻¹?", opts: ["Ethanoic acid is a solid", "Part of the heat released is absorbed to ionize weak ethanoic acid molecules completely", "Water evaporates", "No salt is formed"], ans: 1, exp: "Weak acids only partially ionize; energy is absorbed to break O–H bonds in unionized CH₃COOH molecules." },
+  { topic: "Form 5 • Chap 3: Thermochemistry", q: "Which formula calculates the heat energy (Q) absorbed or released by an aqueous solution?", opts: ["Q = mcθ", "Q = nΔH", "Q = V/24", "Q = It"], ans: 0, exp: "Q = mass of solution (m) × specific heat capacity (c = 4.2 J g⁻¹ °C⁻¹) × temperature change (θ)." },
+  { topic: "Form 5 • Chap 4: Polymer", q: "What is the monomer used to manufacture polythene (polyethene) plastic bags?", opts: ["Ethane", "Ethene", "Ethanol", "Chloroethene"], ans: 1, exp: "Thousands of ethene (C₂H₄) monomers undergo addition polymerisation to form polyethene." },
+  { topic: "Form 5 • Chap 4: Polymer", q: "Vulcanisation improves the elasticity and heat resistance of natural rubber by adding:", opts: ["Carbon black", "Sulfur cross-links between polyisoprene polymer chains", "Ethanoic acid", "Ammonia solution"], ans: 1, exp: "Sulfur cross-links prevent polymer chains from sliding permanently past one another when stretched." },
+  { topic: "Form 5 • Chap 4: Polymer", q: "Why is ammonia solution added to fresh latex collected from rubber trees?", opts: ["To coagulate the latex immediately", "To neutralise lactic acid produced by bacteria and prevent coagulation", "To vulcanise the rubber", "To increase its density"], ans: 1, exp: "OH⁻ ions from ammonia neutralise H⁺ ions from bacterial acid, keeping rubber particles negatively charged so they repel." },
+  { topic: "Form 5 • Chap 5: Consumer Chemistry", q: "Saponification is the alkaline hydrolysis of fats or vegetable oils using concentrated NaOH or KOH to produce:", opts: ["Esters and water", "Soap and glycerol", "Detergent and ethanol", "Alkanes and alkenes"], ans: 1, exp: "Oil/Fat + Alkali → Soap (sodium/potassium salt of fatty acid) + Glycerol." },
+  { topic: "Form 5 • Chap 5: Consumer Chemistry", q: "Why is detergent more effective than soap in hard water (containing Ca²⁺ and Mg²⁺ ions)?", opts: ["Detergent is biodegradable", "Detergent does not form insoluble scum with Ca²⁺ or Mg²⁺ ions", "Detergent is made from animal fats", "Detergent lowers water temperature"], ans: 1, exp: "Calcium/magnesium salts of detergents are soluble in water, whereas soap forms insoluble scum." },
+  { topic: "Form 5 • Chap 5: Consumer Chemistry", q: "Which type of modern medicine is used to kill or inhibit the growth of bacteria (e.g., penicillin)?", opts: ["Analgesic", "Antibiotic", "Psychotherapeutic medicine", "Antacid"], ans: 1, exp: "Antibiotics treat bacterial infections and must be completed as prescribed to prevent antibiotic resistance." }
+];
+
+// 4. Student Token Presets
+const PLAYER_PRESETS = [
+  { name: "Student 1", cls: "4 Amanah", token: "➕", color: "#ef4444" },
+  { name: "Student 2", cls: "4 Amanah", token: "⚡", color: "#3b82f6" },
+  { name: "Student 3", cls: "4 Amanah", token: "⚪", color: "#10b981" },
+  { name: "Student 4", cls: "4 Amanah", token: "⚛️", color: "#f59e0b" },
+  { name: "Student 5", cls: "4 Amanah", token: "🧪", color: "#a855f7" },
+  { name: "Student 6", cls: "4 Amanah", token: "🧬", color: "#ec4899" }
+];
+
+const TOKEN_OFFSETS = [
+  { dx: -16, dy: -14 },
+  { dx:  16, dy: -14 },
+  { dx: -16, dy:  14 },
+  { dx:  16, dy:  14 },
+  { dx:   0, dy: -20 },
+  { dx:   0, dy:  20 }
+];
+
+const POINTS_PER_CORRECT = 10;
+const ADMIN_PASSWORD = "kimia123";
+const STORAGE_KEY_MARKS = "kssm_periodic_student_marks_v1";
+const STORAGE_KEY_LOGS  = "kssm_periodic_correct_logs_v1";
+
+let selectedCount = 1; // Supports 1 player solo up to 6 players
+let players = [];
+let currentPlayerIdx = 0;
+let roundNum = 1;
+let isBusy = false;
+let pendingEvent = null;
+let usedQuestionIndices = new Set();
+let sessionId = Date.now();
+let correctAnswersLog = [];
+
+// Audio
+function playTone(freq, type = "sine", duration = 0.14) {
+  if (!document.getElementById("soundToggle").checked) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch (e) {}
+}
+
+function getTileCoords(tileNum) {
+  const idx = tileNum - 1;
+  const rowFromBottom = Math.floor(idx / 10);
+  const row = 9 - rowFromBottom;
+  const rem = idx % 10;
+  const col = (rowFromBottom % 2 === 0) ? rem : (9 - rem);
+  return { row, col };
+}
+
+function getTileCenterSVG(tileNum) {
+  const { row, col } = getTileCoords(tileNum);
+  return {
+    x: col * 100 + 50,
+    y: row * 100 + 50
+  };
+}
+
+function buildBoard() {
+  const grid = document.getElementById("boardGrid");
+  grid.innerHTML = "";
+
+  const matrix = Array.from({ length: 10 }, () => Array(10).fill(null));
+  for (let n = 1; n <= 100; n++) {
+    const { row, col } = getTileCoords(n);
+    matrix[row][col] = ELEMENTS[n];
+  }
+
+  for (let r = 0; r < 10; r++) {
+    for (let c = 0; c < 10; c++) {
+      const el = matrix[r][c];
+      const div = document.createElement("div");
+      div.className = `tile ${el.c}`;
+      div.dataset.num = el.z;
+
+      let badge = "";
+      if (LADDERS[el.z]) badge = "🪜";
+      else if (SNAKES[el.z]) badge = "🐍";
+      else if (el.z === 100) badge = "🏁";
+
+      div.innerHTML = `
+        <div class="tile-top">
+          <span>${el.z}</span>
+          <span class="tile-badge">${badge}</span>
+        </div>
+        <div class="tile-symbol">${el.s}</div>
+        <div class="tile-name">${el.n}</div>
+      `;
+      div.onclick = () => inspectElement(el.z);
+      grid.appendChild(div);
+    }
+  }
+
+  drawSnakesAndLaddersSVG();
+}
+
+function drawSnakesAndLaddersSVG() {
+  const svg = document.getElementById("overlaySvg");
+  svg.innerHTML = "";
+
+  Object.entries(LADDERS).forEach(([fromStr, data]) => {
+    const p1 = getTileCenterSVG(Number(fromStr));
+    const p2 = getTileCenterSVG(data.to);
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    const len = Math.hypot(dx, dy);
+    const nx = (-dy / len) * 11;
+    const ny = (dx / len) * 11;
+
+    const rail1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    rail1.setAttribute("x1", p1.x + nx);
+    rail1.setAttribute("y1", p1.y + ny);
+    rail1.setAttribute("x2", p2.x + nx);
+    rail1.setAttribute("y2", p2.y + ny);
+    rail1.setAttribute("stroke", "#4ade80");
+    rail1.setAttribute("stroke-width", "5");
+    rail1.setAttribute("stroke-linecap", "round");
+    rail1.setAttribute("opacity", "0.85");
+    svg.appendChild(rail1);
+
+    const rail2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    rail2.setAttribute("x1", p1.x - nx);
+    rail2.setAttribute("y1", p1.y - ny);
+    rail2.setAttribute("x2", p2.x - nx);
+    rail2.setAttribute("y2", p2.y - ny);
+    rail2.setAttribute("stroke", "#4ade80");
+    rail2.setAttribute("stroke-width", "5");
+    rail2.setAttribute("stroke-linecap", "round");
+    rail2.setAttribute("opacity", "0.85");
+    svg.appendChild(rail2);
+
+    const steps = Math.max(4, Math.floor(len / 34));
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps;
+      const rx = p1.x + dx * t;
+      const ry = p1.y + dy * t;
+      const rung = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      rung.setAttribute("x1", rx + nx);
+      rung.setAttribute("y1", ry + ny);
+      rung.setAttribute("x2", rx - nx);
+      rung.setAttribute("y2", ry - ny);
+      rung.setAttribute("stroke", "#bbf7d0");
+      rung.setAttribute("stroke-width", "3.5");
+      rung.setAttribute("opacity", "0.9");
+      svg.appendChild(rung);
+    }
+  });
+
+  Object.entries(SNAKES).forEach(([fromStr, data]) => {
+    const p1 = getTileCenterSVG(Number(fromStr));
+    const p2 = getTileCenterSVG(data.to);
+    const mx1 = p1.x + (p2.x - p1.x) * 0.33 + 35;
+    const my1 = p1.y + (p2.y - p1.y) * 0.33 - 20;
+    const mx2 = p1.x + (p2.x - p1.x) * 0.66 - 35;
+    const my2 = p1.y + (p2.y - p1.y) * 0.66 + 20;
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", `M ${p1.x} ${p1.y} C ${mx1} ${my1}, ${mx2} ${my2}, ${p2.x} ${p2.y}`);
+    path.setAttribute("fill", "none");
+    path.setAttribute("stroke", "#f87171");
+    path.setAttribute("stroke-width", "7");
+    path.setAttribute("stroke-linecap", "round");
+    path.setAttribute("stroke-dasharray", "12 5");
+    path.setAttribute("opacity", "0.88");
+    svg.appendChild(path);
+
+    const head = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    head.setAttribute("cx", p1.x);
+    head.setAttribute("cy", p1.y);
+    head.setAttribute("r", "9");
+    head.setAttribute("fill", "#ef4444");
+    head.setAttribute("stroke", "#fff");
+    head.setAttribute("stroke-width", "2");
+    svg.appendChild(head);
+  });
+}
+
+function inspectElement(z) {
+  const el = ELEMENTS[z] || ELEMENTS[1];
+  const tile = document.getElementById("inspTile");
+  tile.className = `inspector-tile ${el.c}`;
+  document.getElementById("inspNum").textContent = el.z;
+  document.getElementById("inspSym").textContent = el.s;
+  document.getElementById("inspMass").textContent = el.m;
+  document.getElementById("inspName").textContent = `${el.n} (${el.s})`;
+  document.getElementById("inspFact").textContent = el.f;
+}
+
+// Setup Modal: 1 to 6 Players with Separate Name & Class
+function selectPlayerCount(count) {
+  selectedCount = count;
+  document.querySelectorAll(".count-btn").forEach(btn => {
+    btn.classList.toggle("active", Number(btn.dataset.count) === count);
+  });
+  renderSetupInputs();
+}
+
+function renderSetupInputs() {
+  const container = document.getElementById("setupPlayersGrid");
+  container.className = selectedCount === 1 ? "setup-players-grid single-col" : "setup-players-grid";
+  container.innerHTML = "";
+
+  for (let i = 0; i < selectedCount; i++) {
+    const p = PLAYER_PRESETS[i];
+    const existingName = players[i] ? players[i].name : p.name;
+    const existingClass = players[i] ? players[i].studentClass : p.cls;
+
+    const card = document.createElement("div");
+    card.className = "setup-player-card";
+    card.innerHTML = `
+      <div class="setup-player-header">
+        <span class="token-dot" style="background:${p.color}; width:20px; height:20px; font-size:0.72rem;">${p.token}</span>
+        <span>${selectedCount === 1 ? "Solo Student Details" : `Player ${i + 1} Details`}</span>
+      </div>
+      <div class="field-row">
+        <label for="pNameInput_${i}">Student Name</label>
+        <input type="text" id="pNameInput_${i}" value="${existingName}" maxlength="28" placeholder="Enter student full name" />
+      </div>
+      <div class="field-row">
+        <label for="pClassInput_${i}">Class</label>
+        <input type="text" id="pClassInput_${i}" value="${existingClass}" maxlength="20" placeholder="e.g., 4 Amanah" />
+      </div>
+    `;
+    container.appendChild(card);
+  }
+}
+
+function openSetupModal() {
+  renderSetupInputs();
+  document.getElementById("setupModal").classList.remove("hidden");
+}
+
+function startGame() {
+  players = [];
+  for (let i = 0; i < selectedCount; i++) {
+    const nameVal = document.getElementById(`pNameInput_${i}`).value.trim();
+    const classVal = document.getElementById(`pClassInput_${i}`).value.trim();
+    players.push({
+      id: i,
+      name: nameVal || PLAYER_PRESETS[i].name,
+      studentClass: classVal || "4 Amanah",
+      token: PLAYER_PRESETS[i].token,
+      color: PLAYER_PRESETS[i].color,
+      pos: 1,
+      points: 0,
+      correctCount: 0,
+      attemptedCount: 0,
+      finished: false
+    });
+  }
+  currentPlayerIdx = 0;
+  roundNum = 1;
+  isBusy = false;
+  sessionId = Date.now();
+  usedQuestionIndices.clear();
+  correctAnswersLog = [];
+
+  saveSessionToStorage();
+  document.getElementById("setupModal").classList.add("hidden");
+  document.getElementById("rollBtn").disabled = false;
+  updateFrontBanner();
+  renderScoreboard();
+  renderTokens();
+  inspectElement(1);
+  setStatus(`<strong>${players[0].name}</strong> (${players[0].studentClass}) is ready! Roll the dice.`);
+}
+
+// Persistent Storage for Admin Marks Dashboard
+function saveSessionToStorage() {
+  try {
+    const existingMarks = JSON.parse(localStorage.getItem(STORAGE_KEY_MARKS) || "[]");
+    const dateStr = new Date().toLocaleDateString();
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    players.forEach(p => {
+      const recordKey = `${sessionId}_${p.id}`;
+      const entry = {
+        recordKey,
+        sessionId,
+        studentName: p.name,
+        studentClass: p.studentClass,
+        correctCount: p.correctCount,
+        attemptedCount: p.attemptedCount,
+        points: p.points,
+        pos: p.pos,
+        elementSymbol: ELEMENTS[p.pos].s,
+        status: p.finished ? "Completed (100 Fm)" : "In Progress",
+        dateTime: `${dateStr} ${timeStr}`
+      };
+      const idx = existingMarks.findIndex(r => r.recordKey === recordKey);
+      if (idx >= 0) existingMarks[idx] = entry;
+      else existingMarks.unshift(entry);
+    });
+
+    localStorage.setItem(STORAGE_KEY_MARKS, JSON.stringify(existingMarks));
+  } catch (e) {}
+}
+
+function saveCorrectLogToStorage(logItem) {
+  try {
+    const existingLogs = JSON.parse(localStorage.getItem(STORAGE_KEY_LOGS) || "[]");
+    existingLogs.unshift(logItem);
+    localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(existingLogs));
+  } catch (e) {}
+}
+
+function updateFrontBanner() {
+  if (players.length === 0) return;
+  const active = players[currentPlayerIdx];
+  document.getElementById("frontStudentName").textContent = `${active.token} ${active.name}`;
+  document.getElementById("frontStudentClass").textContent = active.studentClass;
+  document.getElementById("frontStudentPoints").textContent = `⭐ Points: ${active.points}`;
+  document.getElementById("frontCorrectCount").textContent = `✅ Correct Qs: ${active.correctCount}`;
+}
+
+function renderScoreboard() {
+  const list = document.getElementById("playerList");
+  list.innerHTML = "";
+  document.getElementById("turnCounter").textContent = players.length === 1 ? `Solo • Turn ${roundNum}` : `Round ${roundNum}`;
+
+  players.forEach((p, idx) => {
+    const el = ELEMENTS[p.pos];
+    const row = document.createElement("div");
+    row.className = `player-row ${idx === currentPlayerIdx ? "current" : ""}`;
+    row.innerHTML = `
+      <div class="player-info">
+        <span class="token-dot" style="background:${p.color};">${p.token}</span>
+        <div class="player-name-stack">
+          <span class="player-name-label" title="${p.name}">${p.name}</span>
+          <span class="player-class-sub">Class: ${p.studentClass}</span>
+        </div>
+      </div>
+      <div class="player-metrics">
+        <span class="pts-badge">${p.points} pts</span>
+        <span class="player-pos">${p.pos} ${el.s}</span>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+
+  updateFrontBanner();
+}
+
+function renderTokens() {
+  const layer = document.getElementById("tokensLayer");
+  layer.innerHTML = "";
+
+  const byTile = {};
+  players.forEach(p => {
+    if (!byTile[p.pos]) byTile[p.pos] = [];
+    byTile[p.pos].push(p);
+  });
+
+  players.forEach(p => {
+    const { row, col } = getTileCoords(p.pos);
+    const group = byTile[p.pos];
+    const indexInGroup = group.indexOf(p);
+    const offset = group.length > 1 ? TOKEN_OFFSETS[indexInGroup % TOKEN_OFFSETS.length] : { dx: 0, dy: 0 };
+
+    const leftPct = (col + 0.5) * 10 + (offset.dx / 7.6);
+    const topPct = (row + 0.5) * 10 + (offset.dy / 7.6);
+
+    const tok = document.createElement("div");
+    tok.className = `player-token ${p.id === currentPlayerIdx ? "active-turn" : ""}`;
+    tok.style.background = p.color;
+    tok.style.left = `${leftPct}%`;
+    tok.style.top = `${topPct}%`;
+    tok.title = `${p.name} (${p.studentClass}) • ${p.points} pts`;
+    tok.textContent = p.token;
+    layer.appendChild(tok);
+  });
+}
+
+function setStatus(html) {
+  document.getElementById("statusLog").innerHTML = html;
+}
+
+async function handleRoll() {
+  if (isBusy || players.length === 0) return;
+  isBusy = true;
+  document.getElementById("rollBtn").disabled = true;
+
+  const diceEl = document.getElementById("diceDisplay");
+  diceEl.classList.add("rolling");
+  playTone(320, "triangle", 0.1);
+
+  const diceFaces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+  for (let i = 0; i < 8; i++) {
+    diceEl.textContent = diceFaces[Math.floor(Math.random() * 6)];
+    await sleep(55);
+  }
+
+  const roll = Math.floor(Math.random() * 6) + 1;
+  diceEl.classList.remove("rolling");
+  diceEl.textContent = diceFaces[roll - 1];
+  playTone(520, "sine", 0.15);
+
+  const player = players[currentPlayerIdx];
+  const target = Math.min(100, player.pos + roll);
+  setStatus(`<strong>${player.name}</strong> (${player.studentClass}) rolled <strong>${roll}</strong>! Moving to <strong>${target} ${ELEMENTS[target].s}</strong>...`);
+
+  while (player.pos < target) {
+    player.pos++;
+    renderTokens();
+    renderScoreboard();
+    playTone(380 + player.pos * 3, "sine", 0.06);
+    await sleep(150);
+  }
+
+  inspectElement(player.pos);
+  saveSessionToStorage();
+
+  if (player.pos === 100) {
+    player.finished = true;
+    saveSessionToStorage();
+    playTone(660, "triangle", 0.4);
+    showWinnerModal(player);
+    return;
+  }
+
+  const quizEnabled = document.getElementById("quizToggle").checked;
+  if (LADDERS[player.pos]) {
+    const lad = LADDERS[player.pos];
+    if (quizEnabled) {
+      pendingEvent = { type: "ladder", from: player.pos, to: lad.to, label: lad.label };
+      showQuizModal("ladder", lad.label);
+      return;
+    } else {
+      setStatus(`🪜 <strong>${lad.label}!</strong> ${player.name} climbs to <strong>${lad.to} ${ELEMENTS[lad.to].s}</strong>!`);
+      player.pos = lad.to;
+      renderTokens();
+      renderScoreboard();
+      inspectElement(player.pos);
+      saveSessionToStorage();
+    }
+  } else if (SNAKES[player.pos]) {
+    const snk = SNAKES[player.pos];
+    if (quizEnabled) {
+      pendingEvent = { type: "snake", from: player.pos, to: snk.to, label: snk.label };
+      showQuizModal("snake", snk.label);
+      return;
+    } else {
+      setStatus(`🐍 <strong>${snk.label}</strong> ${player.name} slides down to <strong>${snk.to} ${ELEMENTS[snk.to].s}</strong>!`);
+      player.pos = snk.to;
+      renderTokens();
+      renderScoreboard();
+      inspectElement(player.pos);
+      saveSessionToStorage();
+    }
+  }
+
+  advanceTurn();
+}
+
+function getNextQuestion() {
+  if (usedQuestionIndices.size >= KSSM_QUESTIONS.length) {
+    usedQuestionIndices.clear();
+  }
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * KSSM_QUESTIONS.length);
+  } while (usedQuestionIndices.has(idx));
+  usedQuestionIndices.add(idx);
+  return KSSM_QUESTIONS[idx];
+}
+
+let currentQuizObj = null;
+let quizAnsweredCorrectly = false;
+
+function showQuizModal(type, label) {
+  currentQuizObj = getNextQuestion();
+  quizAnsweredCorrectly = false;
+  const student = players[currentPlayerIdx];
+
+  const badge = document.getElementById("quizBadge");
+  if (type === "ladder") {
+    badge.className = "modal-badge badge-ladder";
+    badge.textContent = `🪜 Ladder Challenge: ${label}`;
+  } else {
+    badge.className = "modal-badge badge-snake";
+    badge.textContent = `🐍 Hazard Shield: ${label}`;
+  }
+
+  document.getElementById("quizStudentBanner").textContent =
+    `Student: ${student.name} | Class: ${student.studentClass} • Earn +${POINTS_PER_CORRECT} Points!`;
+  document.getElementById("quizTopic").textContent = currentQuizObj.topic;
+  document.getElementById("quizQuestion").textContent = currentQuizObj.q;
+
+  const optsDiv = document.getElementById("quizOptions");
+  optsDiv.innerHTML = "";
+  currentQuizObj.opts.forEach((optText, i) => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.textContent = `${String.fromCharCode(65 + i)}. ${optText}`;
+    btn.onclick = () => selectQuizAnswer(i, btn);
+    optsDiv.appendChild(btn);
+  });
+
+  const fb = document.getElementById("quizFeedback");
+  fb.style.display = "none";
+  fb.innerHTML = "";
+  document.getElementById("quizContinueBtn").classList.add("hidden");
+  document.getElementById("quizModal").classList.remove("hidden");
+}
+
+function selectQuizAnswer(chosenIdx, clickedBtn) {
+  const buttons = document.querySelectorAll("#quizOptions .option-btn");
+  buttons.forEach((b, idx) => {
+    b.disabled = true;
+    if (idx === currentQuizObj.ans) b.classList.add("correct");
+  });
+
+  const student = players[currentPlayerIdx];
+  student.attemptedCount++;
+  quizAnsweredCorrectly = (chosenIdx === currentQuizObj.ans);
+
+  if (quizAnsweredCorrectly) {
+    student.points += POINTS_PER_CORRECT;
+    student.correctCount++;
+    playTone(620, "triangle", 0.22);
+
+    const el = ELEMENTS[pendingEvent.from];
+    const logItem = {
+      no: correctAnswersLog.length + 1,
+      studentName: student.name,
+      studentClass: student.studentClass,
+      round: roundNum,
+      tile: `${pendingEvent.from} (${el.s} - ${el.n})`,
+      challengeType: pendingEvent.type === "ladder" ? `Ladder (${pendingEvent.label})` : `Snake (${pendingEvent.label})`,
+      syllabusTopic: currentQuizObj.topic,
+      question: currentQuizObj.q,
+      correctAnswer: currentQuizObj.opts[currentQuizObj.ans],
+      pointsAwarded: POINTS_PER_CORRECT,
+      cumulativePoints: student.points,
+      timestamp: `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+    };
+    correctAnswersLog.push(logItem);
+    saveCorrectLogToStorage(logItem);
+    renderScoreboard();
+  } else {
+    clickedBtn.classList.add("wrong");
+    playTone(210, "sawtooth", 0.25);
+  }
+
+  saveSessionToStorage();
+
+  const fb = document.getElementById("quizFeedback");
+  fb.style.display = "block";
+  const outcomeMsg = pendingEvent.type === "ladder"
+    ? (quizAnsweredCorrectly
+        ? `✅ Correct (+${POINTS_PER_CORRECT} pts)! ${student.name} now has ${student.points} pts and climbs to Tile ${pendingEvent.to} (${ELEMENTS[pendingEvent.to].n})!`
+        : `❌ Incorrect (0 pts). ${student.name} stays at Tile ${pendingEvent.from}.`)
+    : (quizAnsweredCorrectly
+        ? `✅ Correct (+${POINTS_PER_CORRECT} pts)! ${student.name} now has ${student.points} pts and blocks the hazard at Tile ${pendingEvent.from}!`
+        : `❌ Incorrect (0 pts). ${student.name} slides down to Tile ${pendingEvent.to} (${ELEMENTS[pendingEvent.to].n})!`);
+
+  fb.innerHTML = `<strong>${outcomeMsg}</strong><br><span style="color:var(--muted);">${currentQuizObj.exp}</span>`;
+  document.getElementById("quizContinueBtn").classList.remove("hidden");
+}
+
+function closeQuizAndApply() {
+  document.getElementById("quizModal").classList.add("hidden");
+  const player = players[currentPlayerIdx];
+
+  if (pendingEvent.type === "ladder" && quizAnsweredCorrectly) {
+    player.pos = pendingEvent.to;
+    setStatus(`🪜 <strong>${player.name}</strong> (+${POINTS_PER_CORRECT} pts) climbed to <strong>${player.pos} ${ELEMENTS[player.pos].s}</strong>!`);
+  } else if (pendingEvent.type === "snake" && !quizAnsweredCorrectly) {
+    player.pos = pendingEvent.to;
+    setStatus(`🐍 <strong>${player.name}</strong> slid down to <strong>${player.pos} ${ELEMENTS[player.pos].s}</strong>!`);
+  } else {
+    setStatus(`🛡️ <strong>${player.name}</strong> remained at <strong>${player.pos} ${ELEMENTS[player.pos].s}</strong>.`);
+  }
+
+  pendingEvent = null;
+  renderTokens();
+  renderScoreboard();
+  inspectElement(player.pos);
+
+  if (player.pos === 100) {
+    player.finished = true;
+    saveSessionToStorage();
+    showWinnerModal(player);
+    return;
+  }
+
+  saveSessionToStorage();
+  advanceTurn();
+}
+
+function showWinnerModal(winner) {
+  document.getElementById("winnerTitle").textContent = `${winner.token} ${winner.name} (${winner.studentClass}) Wins with ${winner.points} Points!`;
+  document.getElementById("winnerSubtitle").textContent =
+    `Reached Element 100 (Fermium) • Correctly answered ${winner.correctCount} Chemistry KSSM question(s).`;
+  document.getElementById("winnerModal").classList.remove("hidden");
+}
+
+function advanceTurn() {
+  currentPlayerIdx = (currentPlayerIdx + 1) % players.length;
+  if (currentPlayerIdx === 0) roundNum++;
+  isBusy = false;
+  document.getElementById("rollBtn").disabled = false;
+  renderScoreboard();
+  renderTokens();
+  const nextP = players[currentPlayerIdx];
+  setStatus(`Turn: <strong>${nextP.name}</strong> (${nextP.studentClass}) • ${nextP.points} pts • Tile <strong>${nextP.pos} ${ELEMENTS[nextP.pos].s}</strong>.`);
+}
+
+// Admin Login & Dashboard Functions
+function openAdminLogin() {
+  document.getElementById("adminPasswordInput").value = "";
+  document.getElementById("adminLoginError").style.display = "none";
+  document.getElementById("adminLoginModal").classList.remove("hidden");
+  setTimeout(() => document.getElementById("adminPasswordInput").focus(), 60);
+}
+
+function closeAdminLogin() {
+  document.getElementById("adminLoginModal").classList.add("hidden");
+}
+
+function verifyAdminPassword() {
+  const entered = document.getElementById("adminPasswordInput").value;
+  if (entered === ADMIN_PASSWORD) {
+    document.getElementById("adminLoginModal").classList.add("hidden");
+    document.getElementById("adminSearchInput").value = "";
+    renderAdminDashboard();
+    document.getElementById("adminDashboardModal").classList.remove("hidden");
+  } else {
+    document.getElementById("adminLoginError").style.display = "block";
+  }
+}
+
+function renderAdminDashboard() {
+  const filter = document.getElementById("adminSearchInput").value.trim().toLowerCase();
+  const savedMarks = JSON.parse(localStorage.getItem(STORAGE_KEY_MARKS) || "[]");
+  const savedLogs = JSON.parse(localStorage.getItem(STORAGE_KEY_LOGS) || "[]");
+
+  const filteredMarks = savedMarks.filter(m =>
+    m.studentName.toLowerCase().includes(filter) ||
+    m.studentClass.toLowerCase().includes(filter)
+  );
+
+  const summaryBody = document.getElementById("adminSummaryBody");
+  summaryBody.innerHTML = "";
+  if (filteredMarks.length === 0) {
+    summaryBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted);">No student records found yet.</td></tr>`;
+  } else {
+    filteredMarks.forEach((m, idx) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td><strong>${m.studentName}</strong></td>
+        <td>${m.studentClass}</td>
+        <td style="color:#4ade80; font-weight:700;">${m.correctCount}</td>
+        <td>${m.attemptedCount}</td>
+        <td style="color:#fbbf24; font-weight:800;">${m.points} pts</td>
+        <td>${m.pos} ${m.elementSymbol}</td>
+        <td>${m.status} • <span style="color:var(--muted); font-size:0.76rem;">${m.dateTime}</span></td>
+      `;
+      summaryBody.appendChild(tr);
+    });
+  }
+
+  const filteredLogs = savedLogs.filter(l =>
+    l.studentName.toLowerCase().includes(filter) ||
+    l.studentClass.toLowerCase().includes(filter) ||
+    l.syllabusTopic.toLowerCase().includes(filter)
+  );
+
+  const qBody = document.getElementById("adminQuestionsBody");
+  qBody.innerHTML = "";
+  if (filteredLogs.length === 0) {
+    qBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted);">No correctly answered questions recorded yet.</td></tr>`;
+  } else {
+    filteredLogs.forEach((l, idx) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td><strong>${l.studentName}</strong></td>
+        <td>${l.studentClass}</td>
+        <td>${l.syllabusTopic}</td>
+        <td>${l.question}</td>
+        <td style="color:#4ade80;">${l.correctAnswer}</td>
+        <td style="color:#fbbf24; font-weight:700;">+${l.pointsAwarded}</td>
+      `;
+      qBody.appendChild(tr);
+    });
+  }
+}
+
+function clearSavedAdminRecords() {
+  if (!confirm("Are you sure you want to clear all saved student marks history on this device?")) return;
+  localStorage.removeItem(STORAGE_KEY_MARKS);
+  localStorage.removeItem(STORAGE_KEY_LOGS);
+  if (players.length > 0) saveSessionToStorage();
+  renderAdminDashboard();
+}
+
+// CSV Export Helpers
+function csvEscape(val) {
+  const str = String(val ?? "");
+  if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+function triggerCSVDownload(lines, filename) {
+  const csvContent = "\uFEFF" + lines.join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Download current game session CSV
+function downloadResultsCSV() {
+  if (players.length === 0) {
+    alert("Please enter student details and start the game first!");
+    return;
+  }
+
+  const lines = [];
+  const dateStr = new Date().toLocaleDateString();
+
+  lines.push("SECTION 1: STUDENT MARKS SUMMARY (CURRENT SESSION)");
+  lines.push(["Student Name", "Class", "Current Tile", "Correct Questions Count", "Total Questions Attempted", "Total Marks (Points)", "Date"].map(csvEscape).join(","));
+
+  players.forEach(p => {
+    lines.push([
+      p.name,
+      p.studentClass,
+      `${p.pos} (${ELEMENTS[p.pos].s})`,
+      p.correctCount,
+      p.attemptedCount,
+      p.points,
+      dateStr
+    ].map(csvEscape).join(","));
+  });
+
+  lines.push("");
+  lines.push("SECTION 2: DATA OF QUESTIONS CORRECTLY ANSWERED");
+  lines.push([
+    "No.",
+    "Student Name",
+    "Class",
+    "Round",
+    "Board Tile / Element",
+    "Challenge Type",
+    "KSSM Syllabus Topic",
+    "Question Correctly Answered",
+    "Correct Answer",
+    "Points Earned",
+    "Cumulative Student Marks",
+    "Timestamp"
+  ].map(csvEscape).join(","));
+
+  if (correctAnswersLog.length === 0) {
+    lines.push("No questions answered correctly yet.");
+  } else {
+    correctAnswersLog.forEach(entry => {
+      lines.push([
+        entry.no,
+        entry.studentName,
+        entry.studentClass,
+        entry.round,
+        entry.tile,
+        entry.challengeType,
+        entry.syllabusTopic,
+        entry.question,
+        entry.correctAnswer,
+        entry.pointsAwarded,
+        entry.cumulativePoints,
+        entry.timestamp
+      ].map(csvEscape).join(","));
+    });
+  }
+
+  triggerCSVDownload(lines, `Chemistry_KSSM_Student_Marks_${new Date().toISOString().slice(0,10)}.csv`);
+}
+
+// Download ALL saved records from Admin Dashboard
+function downloadAdminAllCSV() {
+  const savedMarks = JSON.parse(localStorage.getItem(STORAGE_KEY_MARKS) || "[]");
+  const savedLogs = JSON.parse(localStorage.getItem(STORAGE_KEY_LOGS) || "[]");
+
+  const lines = [];
+  lines.push("ALL SAVED STUDENT MARKS SUMMARY");
+  lines.push(["Student Name", "Class", "Correct Qs", "Attempted Qs", "Total Marks (Points)", "Final/Current Tile", "Status", "Date & Time"].map(csvEscape).join(","));
+
+  savedMarks.forEach(m => {
+    lines.push([
+      m.studentName,
+      m.studentClass,
+      m.correctCount,
+      m.attemptedCount,
+      m.points,
+      `${m.pos} (${m.elementSymbol})`,
+      m.status,
+      m.dateTime
+    ].map(csvEscape).join(","));
+  });
+
+  lines.push("");
+  lines.push("ALL CORRECTLY ANSWERED QUESTIONS LOG");
+  lines.push(["Student Name", "Class", "KSSM Syllabus Topic", "Question Correctly Answered", "Correct Answer", "Points Earned", "Timestamp"].map(csvEscape).join(","));
+
+  savedLogs.forEach(l => {
+    lines.push([
+      l.studentName,
+      l.studentClass,
+      l.syllabusTopic,
+      l.question,
+      l.correctAnswer,
+      l.pointsAwarded,
+      l.timestamp
+    ].map(csvEscape).join(","));
+  });
+
+  triggerCSVDownload(lines, `Admin_All_Chemistry_KSSM_Marks_${new Date().toISOString().slice(0,10)}.csv`);
+}
+
+function sleep(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+document.addEventListener("keydown", (e) => {
+  const modalsClosed =
+    document.getElementById("setupModal").classList.contains("hidden") &&
+    document.getElementById("quizModal").classList.contains("hidden") &&
+    document.getElementById("adminLoginModal").classList.contains("hidden") &&
+    document.getElementById("adminDashboardModal").classList.contains("hidden");
+
+  if (e.code === "Space" && !isBusy && modalsClosed) {
+    e.preventDefault();
+    handleRoll();
+  }
+});
+
+// Initialize on load
+buildBoard();
+renderSetupInputs();
+</script>
+</body>
+</html>
